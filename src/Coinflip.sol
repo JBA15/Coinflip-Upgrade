@@ -7,7 +7,15 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract MyContract is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+/// @title Coinflip 10 in a Row
+/// @author Tianchan Dong, modified by Jean-Baptiste Astruc
+/// @notice Contract used as part of the course Solidity and Smart Contract development
+
+error SeedTooShort();
+
+contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    string public seed;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -16,6 +24,8 @@ contract MyContract is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function initialize(address initialOwner) initializer public {
         __Ownable_init(initialOwner);
         __UUPSUpgradeable_init();
+        // Setting the seed to "It is a good practice to rotate seeds often in gambling".
+        seed = "It is a good practice to rotate seeds often in gambling";
     }
 
     function _authorizeUpgrade(address newImplementation)
@@ -23,21 +33,6 @@ contract MyContract is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         onlyOwner
         override
     {}
-}
-
-error SeedTooShort();
-
-/// @title Coinflip 10 in a Row
-/// @author Tianchan Dong, modified by Jean-Baptiste Astruc
-/// @notice Contract used as part of the course Solidity and Smart Contract development
-contract Coinflip is Ownable{
-    
-    string public seed;
-
-    constructor() Ownable(msg.sender) {
-        // Setting the seed to "It is a good practice to rotate seeds often in gambling".
-        seed = "It is a good practice to rotate seeds often in gambling";
-    }
 
     /// @notice Checks user input against contract generated guesses
     /// @param Guesses is a fixed array of 10 elements which holds the user's guesses. The guesses are either 1 or 0 for heads or tails
