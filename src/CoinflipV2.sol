@@ -51,6 +51,7 @@ contract CoinflipV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     /// @notice allows the owner of the contract to change the seed to a new one
     /// @param NewSeed is a string which represents the new seed
+    /// @param rotations the number of rotations
     function seedRotation(string memory NewSeed, uint rotations) public onlyOwner {
         // Casting the string into a bytes array so we may perform operations on it
         bytes memory seedBytes = bytes(NewSeed);
