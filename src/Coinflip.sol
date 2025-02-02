@@ -2,7 +2,6 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.28;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -11,9 +10,9 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 /// @author Tianchan Dong, modified by Jean-Baptiste Astruc
 /// @notice Contract used as part of the course Solidity and Smart Contract development
 
-error SeedTooShort();
-
 contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    error SeedTooShort();
+
     string public seed;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -57,10 +56,10 @@ contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         bytes memory seedBytes = bytes(NewSeed);
 
         // Getting the length of the array
-        uint seedlength = seedBytes.length;
+        uint seedLength = seedBytes.length;
 
         // Checking if the seed is less than 10 characters
-        if (seedlength < 10){
+        if (seedLength < 10){
             revert SeedTooShort();
         }
 
@@ -71,16 +70,16 @@ contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 // -------------------- helper functions -------------------- //
     /// @notice This function generates 10 random flips by hashing characters of the seed
     /// @return a fixed 10 element array of type uint8 with only 1 or 0 as its elements
-    function getFlips() public view returns(uint8[10] memory) {
+    function getFlips() public view returns (uint8[10] memory) {
         // Casting the seed into a bytes array and getting its length
         bytes memory stringInBytes = bytes(seed);
-        uint seedlength = stringInBytes.length;
+        uint seedLength = stringInBytes.length;
 
         // Initializing an empty fixed array with 10 uint8 elements
         uint8[10] memory flips;
 
         // Setting the interval for grabbing characters
-        uint interval = seedlength / 10;
+        uint interval = seedLength / 10;
 
         // Defining a for loop that iterates 10 times to generate each flip
         for (uint i = 0; i < 10; i++){

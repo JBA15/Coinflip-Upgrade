@@ -2,7 +2,6 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.28;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -11,9 +10,9 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 /// @author Tianchan Dong, modified by Jean-Baptiste Astruc
 /// @notice Contract used as part of the course Solidity and Smart Contract development
 
-error SeedTooShort();
+contract CoinflipV2 is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    error SeedTooShort();
 
-contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     string public seed;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -52,35 +51,50 @@ contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     /// @notice allows the owner of the contract to change the seed to a new one
     /// @param NewSeed is a string which represents the new seed
-    function seedRotation(string memory NewSeed) public onlyOwner {
+    function seedRotation(string memory NewSeed, uint rotations) public onlyOwner {
         // Casting the string into a bytes array so we may perform operations on it
         bytes memory seedBytes = bytes(NewSeed);
 
         // Getting the length of the array
-        uint seedlength = seedBytes.length;
+        uint seedLength = seedBytes.length;
 
         // Checking if the seed is less than 10 characters
-        if (seedlength < 10){
+        if (seedLength < 10){
             revert SeedTooShort();
         }
 
-        // Setting the seed variable as the NewSeed
-        seed = NewSeed;
+        // Performing the rotations: each iteration moves the first character to the end.
+        for (uint i = 0; i < rotations; i++) {
+            // Saving the first character.
+            bytes1 firstChar = seedBytes[0];
+            // Creating a new bytes array to hold the rotated result.
+            bytes memory rotated = new bytes(seedLength);
+            // Copying all characters except the first, shifting them one index to the left.
+            for (uint j = 1; j < seedLength; j++) {
+                rotated[j - 1] = seedBytes[j];
+            }
+            // Placing the first character at the end.
+            rotated[seedLength - 1] = firstChar;
+            // Updating seedBytes with the rotated version.
+            seedBytes = rotated;
+        }
+        // Setting the seed variable
+        seed = string(seedBytes);
     }
 
 // -------------------- helper functions -------------------- //
     /// @notice This function generates 10 random flips by hashing characters of the seed
     /// @return a fixed 10 element array of type uint8 with only 1 or 0 as its elements
-    function getFlips() public view returns(uint8[10] memory) {
+    function getFlips() public view returns (uint8[10] memory) {
         // Casting the seed into a bytes array and getting its length
         bytes memory stringInBytes = bytes(seed);
-        uint seedlength = stringInBytes.length;
+        uint seedLength = stringInBytes.length;
 
         // Initializing an empty fixed array with 10 uint8 elements
         uint8[10] memory flips;
 
         // Setting the interval for grabbing characters
-        uint interval = seedlength / 10;
+        uint interval = seedLength / 10;
 
         // Defining a for loop that iterates 10 times to generate each flip
         for (uint i = 0; i < 10; i++){
@@ -94,7 +108,6 @@ contract Coinflip is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 flips[i] = 0;
             }
         }
-
         // Returning the resulting fixed array
         return flips;
     }
